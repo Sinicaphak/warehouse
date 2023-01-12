@@ -1,4 +1,4 @@
-import java.sql.SQLException;
+
 
 public class Test {
     public static void main(String[] args){
@@ -6,6 +6,7 @@ public class Test {
 
         try {
             studentManagement = new StudentManagement();
+
             //添加班级
             studentManagement.addClass(2,"计算机与大数据学院");
             studentManagement.addClass(5,"化学学院");

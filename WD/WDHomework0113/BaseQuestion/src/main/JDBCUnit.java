@@ -1,8 +1,6 @@
-package JDBCUnit;
-
-import java.sql.*;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.*;
 import java.util.Properties;
 
 /**

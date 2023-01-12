@@ -1,6 +1,4 @@
 
-import JDBCUnit.JDBCUnit;
-
 import java.sql.*;
 
 /**

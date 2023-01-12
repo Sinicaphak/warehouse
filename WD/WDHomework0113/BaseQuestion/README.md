@@ -7,4 +7,5 @@
       2. `class `：`class_no`、`student_no`、`admission_time`
       3. `class_information`：`class_no`、`grade_no`、`collage_name`
 2. 已实现学生信息的插入、修改、删除；班级信息的修改、插入、删除。
+3. 尝试使用Maven管理项目
 

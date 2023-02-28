@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+    <!--targetRuntime: 执行生成的逆向工程的版本-->
+    <context id="DB2Tables" targetRuntime="MyBatis3">
+        <!-- 数据库的连接信息 -->
+        <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
+                        connectionURL="jdbc:mysql://localhost:3306/winter_vacation"
+                        userId="WDHomework0215"
+                        password="123456">
+        </jdbcConnection>
+        <!-- javaBean的生成策略-->
+        <javaModelGenerator targetPackage="com.p1.pojo" targetProject=".\src\main\java">
+            <property name="enableSubPackages" value="true"/>
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+        <!-- SQL映射文件的生成策略 -->
+        <sqlMapGenerator targetPackage="com.p1.dao"
+                         targetProject=".\src\main\resources">
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+        <!-- Mapper接口的生成策略 -->
+        <javaClientGenerator type="XMLMAPPER"
+                             targetPackage="com.p1.dao" targetProject=".\src\main\java">
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+        <!-- 逆向分析的表 -->
+        <!-- domainObjectName属性指定生成出来的实体类的类名 -->
+        <table tableName="download_history" domainObjectName="DownloadHistory"/>
+        <table tableName="search_history" domainObjectName="SearchHistory"/>
+        <table tableName="song" domainObjectName="Song"/>
+        <table tableName="user" domainObjectName="User"/>
+    </context>
+</generatorConfiguration>

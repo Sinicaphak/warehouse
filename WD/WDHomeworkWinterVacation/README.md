@@ -1,9 +1,9 @@
 已实现接口：
 /user/login
 /user
+/user/history?page=
 未调试接口：
 /user/history
-/user/history?page=
 /user/history/lc
 /search
 /search/download?text=

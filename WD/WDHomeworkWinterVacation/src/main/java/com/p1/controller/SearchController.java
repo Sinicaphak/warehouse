@@ -8,24 +8,27 @@ import com.p1.pojo.Song;
 import com.p1.service.inter.DownloadHistoryService;
 import com.p1.service.inter.SearchHistoryService;
 import com.p1.service.inter.SongService;
+import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.ArrayList;
+import java.io.*;
+import java.net.*;
 import java.util.List;
 
 
 @Controller
 @ComponentScan("service")
+@RequestMapping("/search")
 public class SearchController {
 
     @Autowired
@@ -41,7 +44,7 @@ public class SearchController {
     SearchHistoryService searchHistoryService;
 
     @ResponseBody
-    @GetMapping("/search")
+    @GetMapping
     public Result search(@RequestHeader("Authorization") String token, @RequestParam String text) {
         int userId = TokenUnit.gainUserIdByToken(token);
         try {
@@ -51,31 +54,39 @@ public class SearchController {
         }
     }
 
-    @GetMapping("search/download/:{rid}")
-    public Result download(@RequestHeader("Authorization") String token, @PathVariable("rid") int rid,HttpServletResponse response) throws IOException {
-        int userId = TokenUnit.gainUserIdByToken(token);
+    @GetMapping(value = "/download/:{rid}",produces="application/octet-stream")
+    public void download(@PathVariable("rid") int rid,HttpServletResponse response) throws IOException {
         Song song = songService.selectSongByRid(rid);
+        String fileName = song.getSongName() + ".mp3";
         URL url = new URL(song.getUrl());
 
-        /**
-         * 获取文件输出流
-         * */
-        InputStream inputStream = url.openStream();
-        response.reset();
-        response.setContentType("application/octet-stream");
-        String filename = song.getSongName() + ".mp3";
-        response.addHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(filename, "UTF-8"));
-        ServletOutputStream outputStream = response.getOutputStream();
-        byte[] b = new byte[1024];
-        int len;
-        while ((len = inputStream.read(b)) > 0) {
-            outputStream.write(b, 0, len);
+        ServletOutputStream servletOutputStream = null;
+        InputStream inputStream = null;
+        HttpURLConnection httpURLConnection=(HttpURLConnection) url.openConnection();
+        try {
+            response.setHeader("Content-Type", "application/force-download;charset=utf-8");
+            response.setHeader("Content-Disposition", "attachment;filename=" +
+                    URLEncoder.encode(fileName, "UTF-8"));
+
+            inputStream = httpURLConnection.getInputStream();
+            servletOutputStream = response.getOutputStream();
+            int len;
+            byte[] b = new byte[1024];
+            while (true) {
+                len = inputStream.read(b);
+                if (len == -1) break;
+                servletOutputStream.write(b, 0, len);
+            }
+            // 释放资源
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            servletOutputStream.close();
+            inputStream.close();
+            httpURLConnection.disconnect();
         }
-        inputStream.close();
 
-        downloadHistoryService.insertDownloadHistory(userId, rid);
-
-        return Result.gainSuccess();
     }
 
     /**
@@ -99,3 +110,5 @@ public class SearchController {
         return result;
     }
 }
+
+

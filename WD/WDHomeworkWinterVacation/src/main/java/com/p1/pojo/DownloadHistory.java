@@ -135,4 +135,5 @@ public class DownloadHistory {
     public void setFav(Integer fav) {
         this.fav = fav;
     }
+
 }

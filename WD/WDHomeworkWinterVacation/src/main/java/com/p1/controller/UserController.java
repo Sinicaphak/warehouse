@@ -9,6 +9,7 @@ import com.github.pagehelper.PageInfo;
 import com.p1.common.Result;
 import com.p1.common.TokenUnit;
 import com.p1.pojo.DownloadHistory;
+import com.p1.pojo.DownloadHistoryAndSong;
 import com.p1.pojo.Song;
 import com.p1.pojo.User;
 import com.p1.service.inter.DownloadHistoryService;
@@ -117,28 +118,24 @@ public class UserController {
     }
 
     @GetMapping("/history")
-    public String getDownloadHistory(@PathVariable int page,@RequestHeader("Authorization") String token) throws JsonProcessingException {
-       int userId=TokenUnit.gainUserIdByToken(token);
+    public String getDownloadHistory(@RequestParam int page,@RequestHeader("Authorization") String token) throws JsonProcessingException {
+        int userId=TokenUnit.gainUserIdByToken(token);
 
-        Pageable pageable= PageRequest.of(page, DownloadHistoryService.PAGE_SIZE);
-        PageInfo<Song> songPage=downloadHistoryService.gainSongByPage(userId, pageable.getPageNumber());
-        List<Song> list=songPage.getList();
+        PageInfo<DownloadHistoryAndSong> songPage=downloadHistoryService.gainSongByPage(userId, page);
+        List<DownloadHistoryAndSong> list=songPage.getList();
 
         Result result=Result.gainSuccess();
         result.putObject("list", list);
-        result.putObject("count", songPage.getPageSize());
+        result.putObject("count", songPage.getPages());
 
         return Result.outputJson(result);
     }
 
-    @PutMapping("/lc")
+    @PutMapping("/history/lc")
     public String updateDownloadHistoryFav(@RequestBody String json) throws JsonProcessingException {
         JsonNode jsonNode=objectMapper.readTree(json);
-        String fav=jsonNode.get("fav").asText();
-        String id=jsonNode.get("id").asText();
-
-        int downloadHistoryId=Integer.parseInt(id);
-        int isFav=Integer.parseInt(fav);
+        int isFav=jsonNode.get("fav").asInt();
+        int downloadHistoryId=jsonNode.get("id").asInt();
 
         int songRid=downloadHistoryService.selectDownloadHistoryById(downloadHistoryId).getRid();
         Song song=songService.selectSongByRid(songRid);

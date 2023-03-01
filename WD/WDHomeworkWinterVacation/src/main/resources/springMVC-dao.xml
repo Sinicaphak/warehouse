@@ -33,6 +33,19 @@
         <property name="mapperLocations" value="classpath*:com/p1/dao/*.xml"/>
         <!--绑定Mybatis的配置文件-->
         <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <!--pageHelper-->
+        <property name="plugins">
+            <array>
+                <bean class="com.github.pagehelper.PageInterceptor">
+                    <property name="properties">
+                        <!--使用下面的方式配置参数，一行配置一个 -->
+                        <value>
+                            reasonable=true
+                        </value>
+                    </property>
+                </bean>
+            </array>
+        </property>
     </bean>
     <!--配置扫描Dao接口包，动态实现Dao接口注入到spring容器中 -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">

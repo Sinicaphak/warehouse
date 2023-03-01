@@ -1,6 +1,7 @@
 package com.p1.dao;
 
 import com.p1.pojo.DownloadHistory;
+import com.p1.pojo.DownloadHistoryAndSong;
 import com.p1.pojo.DownloadHistoryExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
@@ -93,4 +94,10 @@ public interface DownloadHistoryMapper {
      * @mbg.generated Tue Feb 28 17:37:46 GMT+08:00 2023
      */
     int updateByPrimaryKey(DownloadHistory row);
+
+
+    /**
+     *  通过userId联表查询Song和DownloadHistory的数据
+     */
+    List<DownloadHistoryAndSong> selectDownloadHistoryAndSongByRid(int userId);
 }

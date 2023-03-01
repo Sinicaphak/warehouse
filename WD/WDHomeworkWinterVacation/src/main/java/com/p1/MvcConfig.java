@@ -8,6 +8,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class MvcConfig implements WebMvcConfigurer {
 
+    /**
+     * 拦截除登录注册下载外的路径
+     * */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new TokenInterceptor()).addPathPatterns("/**").

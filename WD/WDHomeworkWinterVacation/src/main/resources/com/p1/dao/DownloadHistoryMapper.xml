@@ -12,6 +12,10 @@
     <result column="user_id" jdbcType="INTEGER" property="userId" />
     <result column="fav" jdbcType="INTEGER" property="fav" />
   </resultMap>
+  
+  <resultMap id="DownloadHistoryAndSongMap" type="com.p1.pojo.DownloadHistoryAndSong" autoMapping="true"></resultMap>
+  
+  
   <sql id="Example_Where_Clause">
     <!--
       WARNING - @mbg.generated
@@ -268,4 +272,8 @@
       fav = #{fav,jdbcType=INTEGER}
     where download_history_id = #{downloadHistoryId,jdbcType=INTEGER}
   </update>
+
+  <select id="selectDownloadHistoryAndSongByRid" parameterType="java.lang.Integer" resultMap="DownloadHistoryAndSongMap">
+    select * from download_history,song where download_history.rid=song.rid and `download_history`.user_id=#{userId}
+  </select>
 </mapper>

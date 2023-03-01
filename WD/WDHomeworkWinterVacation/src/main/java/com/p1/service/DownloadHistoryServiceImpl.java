@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.p1.dao.DownloadHistoryMapper;
 import com.p1.pojo.DownloadHistory;
+import com.p1.pojo.DownloadHistoryAndSong;
 import com.p1.pojo.DownloadHistoryExample;
 import com.p1.pojo.Song;
 import com.p1.service.inter.DownloadHistoryService;
@@ -67,22 +68,15 @@ public class DownloadHistoryServiceImpl implements DownloadHistoryService {
      * userId：用户id
      * index：页码
      *
-     * 查询对应用户记录，并返回页码等数据（包装在PageInfo内）
+     * 查询对应用户记录，并返回页码等数据（包装在DownloadHistoryAndSong、PageInfo内）
      * */
     @Override
-    public PageInfo<Song> gainSongByPage(int userId, int index) {
+    public PageInfo<DownloadHistoryAndSong> gainSongByPage(int userId, int index) {
+
         PageHelper.startPage(index,DownloadHistoryService.PAGE_SIZE);
+        List<DownloadHistoryAndSong> downloadHistoryAndSongList=downloadHistoryMapper.selectDownloadHistoryAndSongByRid(userId);
 
-        DownloadHistoryExample downloadHistoryExample=new DownloadHistoryExample();
-        downloadHistoryExample.createCriteria().andUserIdEqualTo(userId);
-        List<DownloadHistory> downloadHistoryList=downloadHistoryMapper.selectByExample(downloadHistoryExample);
-
-        List<Song> songList = new ArrayList<>();
-        for (DownloadHistory downloadHistory :downloadHistoryList){
-            songList.add(service.selectSongByRid(downloadHistory.getRid()));
-        }
-
-        return new PageInfo<>(songList);
+        return new PageInfo<>(downloadHistoryAndSongList);
     }
 
     /**
@@ -94,6 +88,7 @@ public class DownloadHistoryServiceImpl implements DownloadHistoryService {
             downloadHistoryMapper.deleteByPrimaryKey(id);
         }
     }
+
 }
     
 

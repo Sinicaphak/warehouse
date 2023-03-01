@@ -32,7 +32,7 @@ public class DownloadHistoryServiceImpl implements DownloadHistoryService {
         DownloadHistory downloadHistory=new DownloadHistory();
         downloadHistory.setRid(rid);
         downloadHistory.setUserId(userId);
-        return downloadHistoryMapper.insert(downloadHistory);
+        return downloadHistoryMapper.insertSelective(downloadHistory);
     }
 
     @Override
@@ -64,18 +64,6 @@ public class DownloadHistoryServiceImpl implements DownloadHistoryService {
     }
 
     /**
-     *  userId：用户id
-     *
-     *  删除对应用户历史记录
-     * */
-    @Override
-    public int deleteAllDownloadHistory(int userId) {
-        DownloadHistoryExample downloadHistoryExample=new DownloadHistoryExample();
-        downloadHistoryExample.createCriteria().andUserIdEqualTo(userId);
-        return downloadHistoryMapper.deleteByExample(downloadHistoryExample);
-    }
-
-    /**
      * userId：用户id
      * index：页码
      *
@@ -95,6 +83,16 @@ public class DownloadHistoryServiceImpl implements DownloadHistoryService {
         }
 
         return new PageInfo<>(songList);
+    }
+
+    /**
+     * 删除list中所有记录
+     * */
+    @Override
+    public void deleteDownloadHistoryByList(List<Integer> list){
+        for (int id:list){
+            downloadHistoryMapper.deleteByPrimaryKey(id);
+        }
     }
 }
     

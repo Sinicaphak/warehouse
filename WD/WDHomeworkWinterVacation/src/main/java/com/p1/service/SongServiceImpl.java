@@ -57,6 +57,12 @@ public class SongServiceImpl implements SongService {
         list.addAll(songMapper.selectByExample(songExample));
         songExample.clear();
 
+        //不知道怎么在json里把字段url去掉(T⌓T)
+        //将url滞空
+        for (Song song:list){
+            song.setUrl("");
+        }
+
         return list;
     }
 }

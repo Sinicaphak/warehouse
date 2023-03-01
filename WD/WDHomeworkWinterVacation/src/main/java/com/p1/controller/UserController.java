@@ -1,8 +1,10 @@
 package com.p1.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.github.pagehelper.PageInfo;
 import com.p1.common.Result;
 import com.p1.common.TokenUnit;
@@ -12,6 +14,7 @@ import com.p1.pojo.User;
 import com.p1.service.inter.DownloadHistoryService;
 import com.p1.service.inter.SongService;
 import com.p1.service.inter.UserService;
+import org.springframework.aot.hint.TypeReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
@@ -19,11 +22,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
+
+    public static final int DELECT_BY_ID= 0;
+    public static final int DELECT_ALL= 1;
 
     @Autowired
     @Qualifier("userServiceImpl")
@@ -85,18 +92,24 @@ public class UserController {
     }
 
     @DeleteMapping("/history")
-    public String deleteDownloadHistory(@RequestBody String json,@RequestHeader("Authorization") String token)
-                                        throws JsonProcessingException {
-        int userId = TokenUnit.gainUserIdByToken(token);
+    public String deleteDownloadHistory(@RequestBody String json) throws JsonProcessingException {
         JsonNode jsonNode=objectMapper.readTree(json);
-        String type=jsonNode.get("type").asText();
-        String id=jsonNode.get("id").asText();
+        int type=jsonNode.get("type").asInt();
+        int id=jsonNode.get("id").asInt();
+        JsonNode jsonNodeList=jsonNode.get("list");
+        List<Integer> list=new ArrayList<>();
+        //怎么直接提取json中的数组？？？
+        //将json中数组数据遍历填入本地的list
+        for (JsonNode jsonNodeId:jsonNodeList){
+            String sid=jsonNodeId.toString();
+            list.add(Integer.parseInt(sid));
+        }
 
-        if (type.equals(DownloadHistory.NO_FAV+"")){
-            downloadHistoryService.deleteDownloadHistoryByDownloadHistoryId(Integer.parseInt(id));
+        if (type==DELECT_BY_ID){
+            downloadHistoryService.deleteDownloadHistoryByDownloadHistoryId(id);
             return Result.outputJson(Result.gainSuccess());
-        }else if (type.equals(DownloadHistory.IS_FAV+"")){
-            downloadHistoryService.deleteAllDownloadHistory(userId);
+        }else if (type==DELECT_ALL){
+            downloadHistoryService.deleteDownloadHistoryByList(list);
             return Result.outputJson(Result.gainSuccess());
         }else {
             return Result.outputJson(Result.gainNotFound());

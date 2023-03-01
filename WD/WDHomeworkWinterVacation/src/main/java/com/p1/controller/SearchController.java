@@ -3,6 +3,7 @@ package com.p1.controller;
 
 import com.p1.common.Result;
 import com.p1.common.TokenUnit;
+import com.p1.common.UncodingTool;
 import com.p1.pojo.Song;
 import com.p1.service.inter.DownloadHistoryService;
 import com.p1.service.inter.SearchHistoryService;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -40,7 +42,7 @@ public class SearchController {
 
     @ResponseBody
     @GetMapping("/search")
-    public Result search(@RequestHeader("Authorization") String token, @PathVariable String text) {
+    public Result search(@RequestHeader("Authorization") String token, @RequestParam String text) {
         int userId = TokenUnit.gainUserIdByToken(token);
         try {
             return searchRecord(userId, text);
@@ -49,14 +51,9 @@ public class SearchController {
         }
     }
 
-    @GetMapping("search/download/{var}")
-    public Result download(@RequestHeader("Authorization") String token, @PathVariable("var") String var,HttpServletResponse response) throws IOException {
+    @GetMapping("search/download/:{rid}")
+    public Result download(@RequestHeader("Authorization") String token, @PathVariable("rid") int rid,HttpServletResponse response) throws IOException {
         int userId = TokenUnit.gainUserIdByToken(token);
-        /**
-         * 利用正则表达式提取rid....我只能想到这种办法了
-         * */
-        int rid=Integer.parseInt(var.replace(":", ""));
-
         Song song = songService.selectSongByRid(rid);
         URL url = new URL(song.getUrl());
 
